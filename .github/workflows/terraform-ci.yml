@@ -20,8 +20,10 @@ jobs:
         uses: actions/setup-python@v6
       - name: Install checkov
         run: pip install checkov
+      # Zone-redundancy checks skipped: not required for preprod (cost-vs-resilience tradeoff).
+      # Repo currently has NO prod env; revisit with inline scoped skips if prod is added.
       - name: Run checkov
-        run: checkov -d .
+        run: checkov -d . --compact --skip-check CKV_AZURE_229,CKV_AZURE_225,CKV_AZURE_212
     
         
       
