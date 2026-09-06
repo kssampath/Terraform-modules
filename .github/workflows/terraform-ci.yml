@@ -16,5 +16,12 @@ jobs:
         run: terraform fmt -check -recursive
       - name: Terraform validate
         run: terraform validate
+      - name: Set up Python
+        uses: actions/setup-python@v6
+      - name: Install checkov
+        run: pip install checkov
+      - name: Run checkov
+        run: checkov -d .
+    
         
       
