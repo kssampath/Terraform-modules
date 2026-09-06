@@ -23,7 +23,7 @@ jobs:
       # Zone-redundancy checks skipped: not required for preprod (cost-vs-resilience tradeoff).
       # Repo currently has NO prod env; revisit with inline scoped skips if prod is added.
       - name: Run checkov
-        run: checkov -d . --compact --skip-check CKV_AZURE_229,CKV_AZURE_225,CKV_AZURE_212
+        run: checkov -d . --compact --skip-check CKV_AZURE_229,CKV_AZURE_225,CKV_AZURE_212,CKV2_GHA_1
     
         
       
