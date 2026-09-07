@@ -4,6 +4,7 @@
 ![azurerm](https://img.shields.io/badge/azurerm-~%3E%204.0-0078D4?logo=microsoftazure&logoColor=white)
 ![Cloud](https://img.shields.io/badge/cloud-Azure-0078D4?logo=microsoftazure&logoColor=white)
 ![IaC](https://img.shields.io/badge/IaC-Terraform-blueviolet)
+[![Terraform CI](https://github.com/kssampath/terraform-azure-data-platform/actions/workflows/terraform-ci.yml/badge.svg)](https://github.com/kssampath/terraform-azure-data-platform/actions/workflows/terraform-ci.yml)
 
 Infrastructure-as-code for provisioning the **Enterprise Data Hub (EDH)** platform on **Microsoft Azure**. This repository holds reusable Terraform modules and the environment configurations that compose them.
 
@@ -48,6 +49,22 @@ Every environment follows the same convention: a root configuration (`main.tf`, 
 - Target cloud: **Microsoft Azure** (public)
 ---
 
+## CI/CD
+
+Every pull request into `main` triggers an automated pipeline
+([`.github/workflows/terraform-ci.yml`](.github/workflows/terraform-ci.yml))
+that gates changes before merge:
+
+| Check | Tool | Behaviour |
+| --- | --- | --- |
+| Formatting | `terraform fmt -check -recursive` | **Blocks** merge on unformatted code |
+| Validation | `terraform validate` | **Blocks** merge on invalid config |
+| Security scan | [Checkov](https://www.checkov.io/) | Report-only baseline (findings tracked as debt) |
+| Custom policy | [`tf-audit`](https://github.com/kssampath/terraform-audit) | Advisory — flags missing required tags / secrets |
+
+Validation runs with `terraform init -backend=false`, so the pipeline needs
+no cloud credentials — it checks code, it does not touch live state or remote state.
+
 ## Getting started
 
 Work happens inside an environment folder, not at the repo root. To stand up the pre-prod environment:
@@ -82,9 +99,10 @@ See the [Preprd README](./Preprd/README.md#security) for environment-specific se
 ## Contributing
 
 1. Create a branch for your change.
-2. Run `terraform fmt` and `terraform validate` before committing.
-3. Run `terraform plan` and include the summary in your pull request.
-4. Open a PR against the default branch for review.
+2. Open a PR against `main`. The CI pipeline runs automatically.
+3. `terraform fmt` and `terraform validate` are **enforced** by the pipeline —
+   run them locally first to avoid a red build.
+4. Review the Checkov and `tf-audit` findings surfaced in the PR checks.
 
 ---
 
