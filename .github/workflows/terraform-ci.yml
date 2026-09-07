@@ -16,5 +16,19 @@ jobs:
         run: terraform fmt -check -recursive
       - name: Terraform validate
         run: terraform validate
-        
+      - name: Set up Python
+        uses: actions/setup-python@v6
+      - name: Install checkov
+        run: pip install checkov
+      # Checkov runs in report-only mode (--soft-fail) to establish a security baseline.
+      # Findings are tracked as known debt, to be remediated before any prod deployment.
+      # --skip-check: zone-redundancy checks permanently waived (not required for preprod).
+      - name: Run checkov
+        run: checkov -d . --compact --soft-fail --skip-check CKV_AZURE_229,CKV_AZURE_225,CKV_AZURE_212
+      - name: Install tf-audit (custom policy tool, Repo 2)
+        run: pip install git+https://github.com/kssampath/terraform-audit.git
+      # REPORT-ONLY: tf-audit currently exits 0 even on findings (LOW severity not enforced).
+      # Exit-code contract fix tracked in terraform-audit repo. Until then this reports, not blocks.
+      - name: Run tf-audit (report-only — see note)
+        run: tf-audit . --required-tags Role     
       
